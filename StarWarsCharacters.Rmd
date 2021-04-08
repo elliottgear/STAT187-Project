@@ -1,6 +1,6 @@
 ---
 title: "StarWarsCharacters"
-author: "John Richardson"
+author: "John Richardson, Elliott Gear, JJ Sheehan, Rex Godbout"
 date: "4/7/2021"
 output: html_document
 ---
