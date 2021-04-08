@@ -22,10 +22,22 @@ data <- read.csv('N_StarWars(1).csv')
 ```{r histogram-region}
 
 
-hist_region <- ggplot(data = data, mapping = aes(x = Location..Census.Region.))+
+hist_region_filtered <- data %>% filter(!is.na(data$Location..Census.Region.))
+
+#removing first row
+
+hist_region_filtered <- hist_region_filtered[-1,]
+
+#removing rows with no response
+
+hist_region_filtered <- hist_region_filtered[!(hist_region_filtered$Location..Census.Region. == ""),]
+
+
+hist_region <- ggplot(data = hist_region_filtered, mapping = aes(x = Location..Census.Region.,fill=Location..Census.Region.))+
   geom_bar(stat="count")+
   coord_flip()+
-  labs()
+  labs(y = "Number of Responses", x = "Region of Participant",title="Number of Participants by Region")+
+  theme(plot.title=element_text(face="bold"),legend.position='none')
 
 hist_region
 
@@ -33,8 +45,34 @@ hist_region
 ```
 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r characters, echo=FALSE}
+
+character_df <- data %>% select(Please.state.whether.you.view.the.following.characters.favorably..unfavorably..or.are.unfamiliar.with.him.her.,X.10,X.11,X.12,X.13,X.14,X.15,X.16,X.17,X.18,X.19,X.20,X.21,X.22)
+
+#make first row column names
+
+changename <- function(df){
+  names(df) <- as.character(unlist(df[1,]))
+  df[-1,]
+}
+
+character_df <- changename(character_df)
+
+#remove empty cells
+character_df <- character_df[!apply(character_df == "",1,all),]
+
+
+char_grouping <- character_df %>% pivot_longer(colnames(character_df),names_to = "Character",values_to = "Rating")
+
+
+character_plot <- ggplot(data = char_grouping,mapping = aes(x = Rating, fill = Rating))+
+  geom_bar(position='dodge')+
+  facet_wrap(~Character,scales="free_y")+
+  coord_flip()+
+  theme(panel.spacing = unit(2,"lines"))
+
+character_plot
+
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
