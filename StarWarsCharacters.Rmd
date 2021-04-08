@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
+library(gridExtra)
 
 data <- read.csv('N_StarWars(1).csv')
 
@@ -45,7 +46,7 @@ hist_region
 ```
 
 
-```{r characters, echo=FALSE}
+```{r characters}
 
 character_df <- data %>% select(Please.state.whether.you.view.the.following.characters.favorably..unfavorably..or.are.unfamiliar.with.him.her.,X.10,X.11,X.12,X.13,X.14,X.15,X.16,X.17,X.18,X.19,X.20,X.21,X.22)
 
@@ -60,19 +61,95 @@ character_df <- changename(character_df)
 
 #remove empty cells
 character_df <- character_df[!apply(character_df == "",1,all),]
+#remove cells that have at least one empty but not all
+
 
 
 char_grouping <- character_df %>% pivot_longer(colnames(character_df),names_to = "Character",values_to = "Rating")
 
 
-character_plot <- ggplot(data = char_grouping,mapping = aes(x = Rating, fill = Rating))+
-  geom_bar(position='dodge')+
-  facet_wrap(~Character,scales="free_y")+
-  coord_flip()+
-  theme(panel.spacing = unit(2,"lines"))
+character_plot <- ggplot(data = char_grouping,mapping = aes(x = Rating, fill = Character))+
+  geom_bar(position='dodge')+coord_flip()
+  #theme(panel.spacing = unit(2,"lines"))
 
 character_plot
 
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r fan_or_not, message = FALSE}
+
+#pull out first two columns
+
+
+seen_df <- data %>% group_by(Have.you.seen.any.of.the.6.films.in.the.Star.Wars.franchise., Gender) %>%  summarise(samplesize = n()) %>% mutate(prop = samplesize / sum(samplesize), percentage = prop*100)
+
+#proportion those who have seen the film and are fans / not seen are fans / seen are not fans / not seen not fans
+
+
+
+#cut empty cells 
+
+seen_df <- seen_df[-c(1,4,5),]
+
+
+seen_plot <- ggplot(data = seen_df, mapping = aes(x = Have.you.seen.any.of.the.6.films.in.the.Star.Wars.franchise., y = percentage, fill = Gender))+
+  geom_col(position = 'dodge')+
+  labs(x = "Have you seen any of the films?", y = "%")
+
+fan_df <- data %>%  group_by(Do.you.consider.yourself.to.be.a.fan.of.the.Star.Wars.film.franchise., Gender) %>% summarise(samplesize=n()) %>% mutate(prop = samplesize / sum(samplesize),percentage = prop*100)
+
+
+fan_df <- fan_df[-c(1,2,3,4,7,8),]
+
+
+fan_plot <- ggplot(data = fan_df, mapping = aes(x = Do.you.consider.yourself.to.be.a.fan.of.the.Star.Wars.film.franchise., y= percentage, fill = Gender))+
+  geom_col(position='dodge')+
+  labs(x = "Are you a fan?", y = "%")
+
+
+gender_df <- data   
+
+
+grid.arrange(seen_plot,fan_plot,nrow = 1)
+
+```
+
+``` {r income}
+
+income_df <- data %>% group_by(Do.you.consider.yourself.to.be.a.fan.of.the.Star.Wars.film.franchise.,Household.Income) %>% summarise(samplesize = n()) %>% mutate(prop = samplesize / sum(samplesize),percentage = prop * 100)
+
+
+income_df <- income_df[-c(1,2,3,4,5,6,7,13,14),]
+
+income_plot <- ggplot(data = income_df, mapping = aes(x = Do.you.consider.yourself.to.be.a.fan.of.the.Star.Wars.film.franchise., y = percentage, fill = Household.Income))+
+  geom_col(position = 'dodge')+
+  labs(x = "",y = "%")+coord_flip()
+
+
+age_df <- data %>% group_by(Do.you.consider.yourself.to.be.a.fan.of.the.Star.Wars.film.franchise.,Age) %>% summarise(samplesize = n()) %>% mutate(prop = samplesize / sum(samplesize),percentage = prop * 100)
+
+
+
+age_df <- age_df[-c(1,2,3,4,5,6,11,12,13),]
+
+age_plot <- ggplot(data = age_df, mapping = aes(x = Do.you.consider.yourself.to.be.a.fan.of.the.Star.Wars.film.franchise., y = percentage, fill = Age))+
+  geom_col(position = 'dodge')+
+  labs(x = "Are you a star wars fan?", y = "%")+coord_flip()
+
+
+
+edu_df <- data %>% group_by(Do.you.consider.yourself.to.be.a.fan.of.the.Star.Wars.film.franchise.,Education) %>% summarise(samplesize = n()) %>% mutate(prop = samplesize / sum(samplesize),percentage = prop * 100)
+
+
+edu_df <- edu_df[-c(1,2,3,4,5,6,7,12,13),]
+
+
+edu_plot <- ggplot(data = edu_df, mapping = aes(x = Do.you.consider.yourself.to.be.a.fan.of.the.Star.Wars.film.franchise., y = percentage, fill = Education))+
+  geom_col(position = 'dodge')+
+  labs(x = "",y = "%")+coord_flip()
+
+
+
+grid.arrange(income_plot,age_plot,edu_plot)
+
+```
