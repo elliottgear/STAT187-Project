@@ -5,7 +5,14 @@ date: "4/7/2021"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+###Introduction
+
+The dataset that our group chose to analyze was the Star Wars Characters Dataset. This dataset contained poll results from 1,186 respondents, and was collected by the website FiveThirtyEight in partnership with SurveyMonkey between the dates of  June 3rd and June 6th, 2014. We chose to analyze this dataset as all of our group members enjoy the Star Wars movies, and they are easily one of the most recognizable franchises in pop-culture. This was an observational study that sought to answer multiple questions regarding opinions about the Star Wars universe. Some of the information contained in this dataset included information on if a respondent considered themselves to be a fan of the franchise or not, their ranking of the Star Wars movies in order of best to worst, and their ranking of the main characters from most favorable to least favorable. Each respondent’s age, gender, household income, and location was also collected.  While the poll used to create the dataset was made up entirely of closed-ended questions, the way the questions were asked to respondents differed throughout the poll. A few questions followed a single answer multiple choice format,  other questions asked users to respond by ranking the answer choices, and there was one question that followed a boilerplate format, asking respondents to rank a list of Star Wars characters by whether they view them favorably, unfavorably, or are unfamiliar with them. While I don’t immediately suspect bias in the results of this poll, Star Wars fans may have been more willing in general to fill out an online Star Wars survey than non-fans, and this could have a direct result on some of the data collected. Our dataset required a lot of cleaning before we were able to analyze it. The StarWars.csv file contained 2 rows with “header” information, and there were multiple repeat column names. We first had to combine the header information into one row with unique column names. We also noticed that there were several columns in the dataset that contained numerous blank cells. Before beginning our data visualization, we made sure to remove the blank cells from our dataset. 
+
+
+
+
+```{r setup, include=FALSE,message=FALSE,warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 
@@ -20,7 +27,7 @@ data <- read.csv('N_StarWars(1).csv')
 ```
 
 
-```{r histogram-region}
+```{r histogram-region,message=FALSE,warning=FALSE}
 
 
 hist_region_filtered <- data %>% filter(!is.na(data$Location..Census.Region.))
@@ -46,37 +53,8 @@ hist_region
 ```
 
 
-```{r characters}
 
-character_df <- data %>% select(Please.state.whether.you.view.the.following.characters.favorably..unfavorably..or.are.unfamiliar.with.him.her.,X.10,X.11,X.12,X.13,X.14,X.15,X.16,X.17,X.18,X.19,X.20,X.21,X.22)
-
-#make first row column names
-
-changename <- function(df){
-  names(df) <- as.character(unlist(df[1,]))
-  df[-1,]
-}
-
-character_df <- changename(character_df)
-
-#remove empty cells
-character_df <- character_df[!apply(character_df == "",1,all),]
-#remove cells that have at least one empty but not all
-
-
-
-char_grouping <- character_df %>% pivot_longer(colnames(character_df),names_to = "Character",values_to = "Rating")
-
-
-character_plot <- ggplot(data = char_grouping,mapping = aes(x = Rating, fill = Character))+
-  geom_bar(position='dodge')+coord_flip()
-  #theme(panel.spacing = unit(2,"lines"))
-
-character_plot
-
-```
-
-```{r fan_or_not, message = FALSE}
+```{r fan_or_not, message = FALSE,warning = FALSE}
 
 #pull out first two columns
 
@@ -114,7 +92,7 @@ grid.arrange(seen_plot,fan_plot,nrow = 1)
 
 ```
 
-``` {r income}
+``` {r income,message = FALSE, warning = FALSE}
 
 income_df <- data %>% group_by(Do.you.consider.yourself.to.be.a.fan.of.the.Star.Wars.film.franchise.,Household.Income) %>% summarise(samplesize = n()) %>% mutate(prop = samplesize / sum(samplesize),percentage = prop * 100)
 
@@ -130,7 +108,7 @@ age_df <- data %>% group_by(Do.you.consider.yourself.to.be.a.fan.of.the.Star.War
 
 
 
-age_df <- age_df[-c(1,2,3,4,5,6,11,12,13),]
+age_df <- age_df[-c(1,2,3,4,5,6,11,12),]
 
 age_plot <- ggplot(data = age_df, mapping = aes(x = Do.you.consider.yourself.to.be.a.fan.of.the.Star.Wars.film.franchise., y = percentage, fill = Age))+
   geom_col(position = 'dodge')+
@@ -153,3 +131,15 @@ edu_plot <- ggplot(data = edu_df, mapping = aes(x = Do.you.consider.yourself.to.
 grid.arrange(income_plot,age_plot,edu_plot)
 
 ```
+
+###Conclusions
+
+
+
+
+
+
+
+###Limitations and Recommendations
+
+There were a few limitations in our study that affected our ability to draw meaningful conclusions from the data. For one, there was no information as to what types of people filled out the initial survey, so it was impossible for us to know if the data was biased or not from the start. Another limitation of the survey was that all of the questions related to observable data, and because of the way questions were asked it was difficult for our group to accurately deduce “what is the general demographic of a Star Wars fan”. Having survey participants rank choices based on a numerical scale may have made it slightly easier to make conclusions from the data. Further research that could be built into this project could include data collection from all people purchasing star wars movies at retailers across the united states, and another  survey given to moviegoers as they are physically going to the movies. These data sets could provide us with lots of information on “assumed” star wars fans, and when asked the right survey questions could be invaluable for answering the question of “what is the general demographic of a Star Wars fan?”.
