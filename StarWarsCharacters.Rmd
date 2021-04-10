@@ -92,6 +92,13 @@ grid.arrange(seen_plot,fan_plot,nrow = 1)
 
 ```
 
+In this first graph we took a broad look at different variables that determine what contributes to the making of a star wars fan. We looked at age, education, and house income. The most notable trend between these three graphs was that household income didn't seem to be apparent in determining the chances of being a star wars fan or not. The percentages are almost perfectly symmetric in shape. We can conclude that this variable has little to no influence on the making of a star wars fan. Household income may affect the rate at which how much someone can enjoy entertainment.
+
+Moving onward to a more diverse trend, was the education graph. One might speculate that the people that took the survey have a higher education level in regards to a GED. It seems like there must be a threshold of education one must have to enjoy and more importantly understand the film. We can infer that pop-culture and even language formalities can impact a person's liking of a film. So, one can assume that a correlation of applicants that have a lower education would not answer or would not enjoy star wars (we still need to prove this statistically). 
+
+
+Then finally we take a look at the age. According to multiple data sets other than our own one can assume from the genre that A typical Star Wars fan is likely male, aged 18-44, watches science, history and horror TV shows. However, upon our data set we see little deviation between age interest. The only notable deviation is that the 60 and up age group has a higher percentage of participants in the survey that do not like star wars. The time when this survey was conducted can most certainly cause this difference in fanbase. Older people typically do not like to partake in new pop-culture entertainment and cling to the past in terms of what was popular when they grew up.
+
 ``` {r income,message = FALSE, warning = FALSE}
 
 income_df <- data %>% group_by(Do.you.consider.yourself.to.be.a.fan.of.the.Star.Wars.film.franchise.,Household.Income) %>% summarise(samplesize = n()) %>% mutate(prop = samplesize / sum(samplesize),percentage = prop * 100)
@@ -134,6 +141,7 @@ grid.arrange(income_plot,age_plot,edu_plot)
 
 ###Conclusions
 
+In conclusion, we have found that economic values pertaining to particular participants have little to no bearing on Star Wars interests. However, social demographics do, we have found that age and education have caused differences in what determines a true star wars fan.
 
 
 
